@@ -1,16 +1,35 @@
 import moment from "moment";
 
-const getCurrentEvent = () => {
-    const now = moment();
-    const end = moment(currentEvent.endTime, 'HH:mm a');
-    const todaySchedule = schedule.Thursday
-    const currentEvent = todaySchedule.filter((event) =>{
-        return (event.startTime <= time && event.endTime >= time)
-    })
+export function getCurrentEvent()  {
+
+    const todaySchedule = getTodaySchedule();
+    const currentEvent = todaySchedule.filter((schedule) =>{
+        const start = moment(schedule.startTime, 'HH:mm a');
+        const end = moment(schedule.endTime, 'HH:mm a');
+        const now = moment();
+        return (start.diff(now)< 0 && end.diff(now) > 0 )
+    });
 
     return currentEvent[0]
 }
 
+export function getNextEvent() {
+
+    const futureEvents = getTodaySchedule().filter(schedule => {
+        const start = moment(schedule.startTime, 'HH:mm a');
+        const now = moment();
+        return start.diff(now) > 0
+    });
+    console.log(futureEvents);
+
+    return futureEvents.length > 0 ? futureEvents[0] : null
+}
+
+
+function getTodaySchedule(){
+
+    return schedule[ moment().format('dddd') ];
+}
 const schedule = {
         "Thursday": [
             {
@@ -57,7 +76,8 @@ const schedule = {
                 title: 'Closing Meeting',
                 link: 'https://bcps-k12-md-us.zoom.us/j/92434199087?pwd=WjJkZmFDVGRhWHZmTHBPakxFazE0QT09'
             },
-        ]
-    }
 
-export default getCurrentEvent()
+        ]
+    };
+
+export default  { getCurrentEvent, getNextEvent};
